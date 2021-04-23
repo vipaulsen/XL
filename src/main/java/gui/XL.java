@@ -30,7 +30,7 @@ public class XL extends Application {
   XLModel model = new XLModel();
 
   public XL() {
-    // TODO: add listener(s) for model? Okay maybe i will
+    // TODO: add listener(s) for model? Okay  i will
   }
 
   public void onCellSelected(GridCell cell) {
