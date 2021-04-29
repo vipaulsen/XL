@@ -6,6 +6,8 @@ import gui.menu.XLBufferedReader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Map;
 import java.util.HashMap;
 import util.XLException;
 
@@ -13,7 +15,17 @@ import expr.*;
 
 public class XLModel implements Environment {
   public static final int COLUMNS = 10, ROWS = 10;
-  private map<String, CellText> values = new HashMap<>();
+  private Map<String, Cell> values = new HashMap<>();
+
+
+
+  public XLModel(){
+    for(int r = 0; r < ROWS; r++){
+      for(int c = 0; c < COLUMNS; c++){
+        values.put(new CellAddress(r,c).toString(), new EmptyCell());
+      }
+    }
+  }
   /**
    * Called when the code for a cell changes.
    *
@@ -25,6 +37,22 @@ public class XLModel implements Environment {
 
 
   public void update(CellAddress address, String text) {
+    if(text.charAt(0) == '#'){
+      values.put(address.toString(), new CellComment(text));
+    }
+
+    /*ExprParser parser = new ExprParser();
+    try{
+      Expr parsedText = parser.build(text);
+    }catch(IOException e){
+      System.out.println(e);
+
+
+    }*/
+
+    /*switch(){
+      case "comment" : values.put(address.toString(), new CellComment(text));
+    }*/
   }
 
   public void loadFile(File file) throws FileNotFoundException {
@@ -36,6 +64,6 @@ public class XLModel implements Environment {
 
   @Override
   public ExprResult value(String name) {
-    return null;
+    return values.get(name).value(this);
   }
 }
