@@ -2,11 +2,14 @@ package model;
 
 import expr.Environment;
 import expr.ExprResult;
-import util.XLBufferedReader;
+import gui.menu.XLBufferedReader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import util.XLException;
+
+import expr.*;
 
 public class XLModel implements Environment {
   public static final int COLUMNS = 10, ROWS = 10;

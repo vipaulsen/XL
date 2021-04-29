@@ -1,4 +1,6 @@
-package util;
+package gui.menu;
+
+import util.XLException;
 
 import java.io.BufferedReader;
 import java.io.File;
