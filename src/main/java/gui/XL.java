@@ -28,7 +28,6 @@ public class XL extends Application {
   ObjectProperty<GridCell> currentCell = new SimpleObjectProperty<>();
   Map<String, GridCell> cells = new HashMap<>();
   XLModel model = new XLModel();
-System.out.print("sp");
   public XL() {
     // TODO: add listener(s) for model? Okay  i will
   }

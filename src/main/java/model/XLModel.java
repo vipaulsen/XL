@@ -1,13 +1,16 @@
 package model;
 
+import expr.Environment;
+import expr.ExprResult;
 import util.XLBufferedReader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 
-public class XLModel {
+public class XLModel implements Environment {
   public static final int COLUMNS = 10, ROWS = 10;
-
+  private map<String, CellText> values = new HashMap<>();
   /**
    * Called when the code for a cell changes.
    *
@@ -22,5 +25,10 @@ public class XLModel {
   }
 
   public void saveFile(File file) {
+  }
+
+  @Override
+  public ExprResult value(String name) {
+    return null;
   }
 }
