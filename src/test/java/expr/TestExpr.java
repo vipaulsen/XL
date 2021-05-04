@@ -21,6 +21,8 @@ public class TestExpr {
                 return new ValueResult(2);
             if (name.equals("A1"))
                 return new ValueResult(3);
+            if (name.equals("A4"))
+                return new ValueResult(3);
             System.out.println(name + " is undefined");
             return new ValueResult(0);
         };

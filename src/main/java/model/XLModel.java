@@ -1,20 +1,21 @@
 package model;
 
-import expr.Environment;
-import expr.ExprResult;
+import expr.*;
 import gui.CellSelectionObserver;
 import gui.GridCell;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
-public class XLModel implements Environment, Observable  {
+public class XLModel implements Environment  {
   public static final int COLUMNS = 10, ROWS = 10;
   private Map<String, Cell> values = new HashMap<>();
   private ArrayList<XLModelObserver> observerList;
+  private ExprParser parser;
 
   public XLModel() {
     for (int r = 0; r < ROWS; r++) {
@@ -23,6 +24,8 @@ public class XLModel implements Environment, Observable  {
       }
     }
     observerList = new ArrayList<>();
+    parser = new ExprParser();
+
   }
   /**
    * Called when the code for a cell changes.
@@ -32,21 +35,40 @@ public class XLModel implements Environment, Observable  {
    */
 
 
-  public void update(CellAddress address, String text) {
-    if (text.charAt(0) == '#') {
-      values.put(address.toString(), new CellComment(text));
+  public void update(CellAddress address, String text){
+    Expr temp;
+    try {
+      temp = parser.build(text);
+    } catch (IOException e){
+      temp = new ErrorExpr("Test");
     }
-    /*ExprParser parser = new ExprParser();
-    try{
-      Expr parsedText = parser.build(text);
-    }catch(IOException e){
-      System.out.println(e);
-    }*/
 
-    /*switch(){
-      case "comment" : values.put(address.toString(), new CellComment(text));
-    }*/
-    notifyObservers(address, text);
+    if (temp.toString().equals(values.get(address.toString()).toString()) || text.equals()) {
+      return;
+    }
+
+    System.out.println("NOTIFYING ALL OBSERVERS");
+    if(text.isEmpty()){
+      EmptyCell emptyCell = new EmptyCell();
+      values.put(address.toString(),emptyCell);
+      notifyObservers(address, emptyCell.toString());
+    }
+    else if (text.charAt(0) == '#') {
+      CellComment comment = new CellComment(text);
+      values.put(address.toString(), comment);
+      notifyObservers(address, comment.toString().substring(1));
+    }
+    else{
+      CellExpr expr = new CellExpr(text);
+      values.put(address.toString(), expr);
+
+      //Kolla om det är ett expr eller value eller nått som måste räknas
+      //Environment env = name -> {
+      //  return new ValueResult(value(name).value());
+      //};
+      notifyObservers(address, "" + expr.value(this).value());
+
+    }
   }
 
   public void loadFile(File file) throws FileNotFoundException {
@@ -80,4 +102,5 @@ public class XLModel implements Environment, Observable  {
       o.notifyChange(address, text);
     }
   }
+
 }

@@ -7,7 +7,7 @@ import expr.ExprResult;
 public class CellComment implements Cell{
     private String comment;
     public CellComment(String s){
-        comment = s.substring(1);
+        comment = s;
     }
 
     @Override

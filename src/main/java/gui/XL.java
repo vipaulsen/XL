@@ -64,13 +64,16 @@ public class XL extends Application {
     TextField editor = new TextField();
     editor.setMinWidth(320);
     editor.setDisable(true);
+
     editor.setOnAction(event -> {
       // This listener is called when the user presses the enter key in the editor.
       GridCell cell = currentCell.get();
       if (cell != null) {
+
         model.update(cell.address, editor.getText());
       }
     });
+
     currentCell.addListener((observable, oldValue, newValue) -> {
       if (oldValue != null) {
         oldValue.onDeselect();
@@ -78,13 +81,15 @@ public class XL extends Application {
       if (newValue != null) {
         addressLbl.setText(newValue.address.toString() + " =");
         editor.setDisable(false);
-        // TODO: update editor text.
+        // TODO: update editor text. DONE 2021-05-04
+        editor.setText(model.toString(currentCell.get().address.toString()));
         editor.requestFocus();
       } else {
         addressLbl.setText("?? =");
         editor.setDisable(true);
       }
     });
+
     HBox editBox = new HBox(5);
     editBox.setAlignment(Pos.BASELINE_LEFT);
     editBox.getChildren().add(addressLbl);
