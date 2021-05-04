@@ -29,7 +29,7 @@ public class XL extends Application {
   Map<String, GridCell> cells = new HashMap<>();
   XLModel model = new XLModel();
   public XL() {
-    // TODO: add listener(s) for model? Okay  i will
+    //model.addListener();
   }
 
   public void onCellSelected(GridCell cell) {
@@ -69,7 +69,7 @@ public class XL extends Application {
         model.update(cell.address, editor.getText());
       } //2nd parameter should be the value of the updated cell, problem is how we translate a exprResult from the cellComment to its string representation
         //when called with the models .value()
-      this.cellValueUpdated(cell.address.toString(), model.value(cell.address.toString()).toString());        //Update the cell in the view
+      //this.cellValueUpdated(cell.address.toString(), model.value(cell.address.toString()).toString());        //Update the cell in the view
     });
     currentCell.addListener((observable, oldValue, newValue) -> {
       if (oldValue != null) {

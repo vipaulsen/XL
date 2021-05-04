@@ -22,6 +22,8 @@ public class CellExpr implements Cell{
         return expr.value(env);
     }
 
-
+    public String toString(){
+        return expr.toString();
+    }
 
 }

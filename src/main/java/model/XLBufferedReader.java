@@ -1,4 +1,4 @@
-package gui.menu;
+package model;
 
 import util.XLException;
 
