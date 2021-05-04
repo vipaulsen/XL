@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
-public class XLModel implements Environment {
+public class XLModel implements Environment, Observable  {
   public static final int COLUMNS = 10, ROWS = 10;
   private Map<String, Cell> values = new HashMap<>();
   private ArrayList<XLModelObserver> observerList;
