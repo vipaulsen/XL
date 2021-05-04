@@ -74,6 +74,7 @@ public class XLModel implements Environment, Observable  {
     observerList.remove(observer);
     System.out.println("removed a listener");
   }
+
   private void notifyObservers(CellAddress address, String text){
     for (XLModelObserver o: observerList) {
       o.notifyChange(address, text);

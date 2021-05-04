@@ -9,5 +9,8 @@ public class EmptyCell implements Cell{
     public ExprResult value(Environment env){
         return null;
     }
-
+    @Override
+    public String toString(){
+        return "";
+    }
 }

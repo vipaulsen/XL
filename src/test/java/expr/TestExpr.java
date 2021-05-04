@@ -25,7 +25,7 @@ public class TestExpr {
             return new ValueResult(0);
         };
         ExprParser parser = new ExprParser();
-        Expr expr = parser.build("1+2*3");
-        assertEquals(expr.value(env).toString(), "7.0");
+        Expr expr = parser.build("A4+1+2*3");
+        assertEquals(expr.value(env).toString(), "10.0");
     }
 }
