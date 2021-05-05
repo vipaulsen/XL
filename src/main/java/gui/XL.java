@@ -30,7 +30,7 @@ public class XL extends Application {
   XLModel model = new XLModel();
   public XL() {
     model.addObserver((cell, value) -> {
-      cellValueUpdated(cell.toString(), value);
+      cellValueUpdated(cell, value);
     });
   }
 
@@ -69,7 +69,6 @@ public class XL extends Application {
       // This listener is called when the user presses the enter key in the editor.
       GridCell cell = currentCell.get();
       if (cell != null) {
-
         model.update(cell.address, editor.getText());
       }
     });
@@ -135,4 +134,18 @@ public class XL extends Application {
   public void saveFile(File file) {
     model.saveFile(file);
   }
+
+  public void clear(){
+    GridCell cell = currentCell.get();
+    if (cell != null) {
+      model.update(cell.address, "");
+    }
+  }
+
+  public void clearAll(){
+    model.setup(true);
+  }
+
 }
+
+

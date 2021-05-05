@@ -17,7 +17,7 @@ public class CellComment implements Cell{
 
     @Override
     public String toString(){
-        return comment;
+        return comment.substring(1);
     }
 
     @Override

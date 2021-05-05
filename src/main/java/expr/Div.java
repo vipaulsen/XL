@@ -6,7 +6,7 @@ class Div extends BinaryExpr {
   }
 
   @Override public ExprResult eval(double op1, double op2) {
-    if (op2 != 0) {
+    if (op2 != 0.0) {
       return new ValueResult(op1 / op2);
     } else {
       return new ErrorResult("division by zero");

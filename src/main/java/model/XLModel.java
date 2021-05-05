@@ -18,15 +18,24 @@ public class XLModel implements Environment  {
   private ExprParser parser;
 
   public XLModel() {
-    for (int r = 0; r < ROWS; r++) {
-      for (int c = 0; c < COLUMNS; c++) {
-        values.put(new CellAddress(r, c).toString(), new EmptyCell());
-      }
-    }
+    setup(false);
     observerList = new ArrayList<>();
     parser = new ExprParser();
-
   }
+
+  public void setup(Boolean clear){
+    for (int r = 0; r < ROWS; r++) {
+      for (int c = 0; c < COLUMNS; c++) {
+        EmptyCell empt = new EmptyCell();
+        CellAddress addr = new CellAddress(r,c);
+        values.put(addr.toString(), empt);
+        if(clear)
+        notifyObservers(addr.toString(), empt.toString());
+      }
+    }
+  }
+
+
   /**
    * Called when the code for a cell changes.
    *
@@ -34,29 +43,28 @@ public class XLModel implements Environment  {
    * @param text    the new code for the cell - can be raw text (starting with #) or an expression
    */
 
-
   public void update(CellAddress address, String text){
-    Expr temp;
+    /*Expr temp;
     try {
       temp = parser.build(text);
     } catch (IOException e){
-      temp = new ErrorExpr("Test");
+      temp = new ErrorExpr("");
     }
 
-    if (temp.toString().equals(values.get(address.toString()).toString()) || text.equals()) {
+    if (temp.toString().equals(values.get(address.toString()).toString())){ //|| text.equals()) {
       return;
-    }
+    }*/
 
     System.out.println("NOTIFYING ALL OBSERVERS");
     if(text.isEmpty()){
       EmptyCell emptyCell = new EmptyCell();
       values.put(address.toString(),emptyCell);
-      notifyObservers(address, emptyCell.toString());
+      notifyObservers(address.toString(), emptyCell.toString());
     }
     else if (text.charAt(0) == '#') {
       CellComment comment = new CellComment(text);
       values.put(address.toString(), comment);
-      notifyObservers(address, comment.toString().substring(1));
+      notifyObservers(address.toString(), comment.toString());
     }
     else{
       values.put(address.toString(), new CellExpr(text));
@@ -86,8 +94,8 @@ public class XLModel implements Environment  {
   }
 
   @Override
-  public ExprResult value(String name) {
-    return values.get(name).value(this);
+  public ExprResult value(String address) {
+    return values.get(address).value(this);
   }
 
   public String getRawString(String address){
@@ -104,7 +112,7 @@ public class XLModel implements Environment  {
     System.out.println("removed a listener");
   }
 
-  private void notifyObservers(CellAddress address, String text){
+  private void notifyObservers(String address, String text){
     for (XLModelObserver o: observerList) {
       o.notifyChange(address, text);
     }

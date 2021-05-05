@@ -1,5 +1,5 @@
 package model;
 
 public interface XLModelObserver {
-    void notifyChange(CellAddress cell, String value);
+    void notifyChange(String cell, String value);
 }

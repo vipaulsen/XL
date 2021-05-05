@@ -10,6 +10,7 @@ public class EmptyCell implements Cell{
     public ExprResult value(Environment env){
         return new ErrorResult("Referencing empty cell");
     }
+
     @Override
     public String toString(){
         return "";
