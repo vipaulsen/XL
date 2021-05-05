@@ -12,7 +12,7 @@ public class CellComment implements Cell{
 
     @Override
     public ExprResult value(Environment env) {
-        return new ErrorResult(comment);
+        return new ErrorResult("Referencing comment");
     }
 
     @Override
@@ -20,4 +20,8 @@ public class CellComment implements Cell{
         return comment;
     }
 
+    @Override
+    public String toRawString(){
+        return comment;
+    }
 }

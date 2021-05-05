@@ -12,7 +12,7 @@ public class CellExpr implements Cell{
         try {
             expr = parser.build(stringExpr);
         } catch (IOException e){
-            expr = new ErrorExpr("Test");
+            expr = new ErrorExpr(e.getMessage());
         }
 
     }

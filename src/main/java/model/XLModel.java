@@ -59,16 +59,23 @@ public class XLModel implements Environment  {
       notifyObservers(address, comment.toString().substring(1));
     }
     else{
-      CellExpr expr = new CellExpr(text);
-      values.put(address.toString(), expr);
-
-      //Kolla om det är ett expr eller value eller nått som måste räknas
-      //Environment env = name -> {
-      //  return new ValueResult(value(name).value());
-      //};
-      notifyObservers(address, "" + expr.value(this).value());
-
+      values.put(address.toString(), new CellExpr(text));
     }
+
+    values.entrySet().forEach(entry ->{
+      String currentAddress = entry.getKey();
+      Cell currentCell = values.get(currentAddress);
+
+      if (currentCell instanceof CellExpr) {
+
+        if(currentCell.value(this).isError()){
+          notifyObservers(currentAddress, currentCell.value(this).toString());
+        }
+        else {
+          notifyObservers(currentAddress, "" + currentCell.value(this).value());
+        }
+      }
+    });
   }
 
   public void loadFile(File file) throws FileNotFoundException {
@@ -83,8 +90,8 @@ public class XLModel implements Environment  {
     return values.get(name).value(this);
   }
 
-  public String toString(String name){
-    return values.get(name).toString();
+  public String getRawString(String address){
+    return values.get(address).toRawString();
   }
 
   public void addObserver(XLModelObserver observer) {

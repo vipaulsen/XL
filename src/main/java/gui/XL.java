@@ -82,7 +82,7 @@ public class XL extends Application {
         addressLbl.setText(newValue.address.toString() + " =");
         editor.setDisable(false);
         // TODO: update editor text. DONE 2021-05-04
-        editor.setText(model.toString(currentCell.get().address.toString()));
+        editor.setText(model.getRawString(currentCell.get().address.toString()));
         editor.requestFocus();
       } else {
         addressLbl.setText("?? =");
