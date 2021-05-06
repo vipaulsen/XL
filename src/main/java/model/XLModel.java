@@ -89,7 +89,6 @@ public class XLModel implements Environment  {
 
   public void loadFile(File file) throws FileNotFoundException {
     XLBufferedReader reader = new XLBufferedReader(file);
-    System.out.println("XLMODEL LOADFILE");
     setup(true);
     try{
       reader.load(values);
@@ -114,6 +113,12 @@ public class XLModel implements Environment  {
   }
 
   public void saveFile(File file) {
+    try{XLPrintStream reader = new XLPrintStream(file.getName());
+      reader.save(values.entrySet());
+    }
+    catch (IOException e){
+      e.getMessage();
+    }
   }
 
   @Override
@@ -127,13 +132,11 @@ public class XLModel implements Environment  {
 
   public void addObserver(XLModelObserver observer) {
     observerList.add(observer);
-    System.out.println("added a listener");
   }
 
   public void removeObserver(XLModelObserver observer) {
     observerList.remove(observer);
-    System.out.println("removed a listener");
-  }
+  }*/
 
   private void notifyObservers(String address, String text){
     for (XLModelObserver o: observerList) {

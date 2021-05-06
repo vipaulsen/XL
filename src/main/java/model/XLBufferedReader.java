@@ -14,7 +14,6 @@ public class XLBufferedReader extends BufferedReader {
     super(new FileReader(file));
   }
 
-  // TODO Change Object to something appropriate DONE 2021-05-06
   public void load(Map<String, Cell> map) throws IOException {
     try {
       while (ready()) {
