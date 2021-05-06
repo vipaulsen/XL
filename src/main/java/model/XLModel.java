@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -57,6 +58,7 @@ public class XLModel implements Environment  {
     }
 
     System.out.println("NOTIFYING ALL OBSERVERS");
+
     if(text.isEmpty()){
       EmptyCell emptyCell = new EmptyCell();
       values.put(address.toString(),emptyCell);
