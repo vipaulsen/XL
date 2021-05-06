@@ -31,11 +31,10 @@ public class XLModel implements Environment  {
         CellAddress addr = new CellAddress(r,c);
         values.put(addr.toString(), empt);
         if(clear)
-        notifyObservers(addr.toString(), empt.toString());
+          notifyObservers(addr.toString(), empt.toString());
       }
     }
   }
-
 
   /**
    * Called when the code for a cell changes.
@@ -43,45 +42,43 @@ public class XLModel implements Environment  {
    * @param address address of the cell that is being edited
    * @param text    the new code for the cell - can be raw text (starting with #) or an expression
    */
+  public void update(CellAddress address, String text) {
 
-  public void update(CellAddress address, String text){
-
-    if(text.equals(values.get(address.toString()).toRawString())) {
+    if (text.equals(values.get(address.toString()).toRawString())) {
       return;
     }
+
+    if (checkCircularity(address.toString(), text)) {
+      Cell currentCell = new CellFactory().makeCell(text);
+      values.put(address.toString(), currentCell);
+      updateAll();
+    }
+  }
+
+  private boolean checkCircularity(String address, String text){
 
     if (text.toUpperCase(Locale.ROOT).contains(address.toString())){
       Cell circularCell = new CircularCell(text);
       values.put(address.toString(), circularCell);
       notifyObservers(address.toString(), circularCell.value(this).toString());
-      return;
+      return false;
     }
+    return true;
+  }
 
-    System.out.println("NOTIFYING ALL OBSERVERS");
-
-    if(text.isEmpty()){
-      EmptyCell emptyCell = new EmptyCell();
-      values.put(address.toString(),emptyCell);
-      notifyObservers(address.toString(), emptyCell.toString());
-    }
-    else if (text.charAt(0) == '#') {
-      CellComment comment = new CellComment(text);
-      values.put(address.toString(), comment);
-      notifyObservers(address.toString(), comment.toString());
-    }
-    else{
-      values.put(address.toString(), new CellExpr(text));
-    }
-
+  private void updateAll(){
     values.forEach((currentAddress, value) -> {
-      Cell currentCell = values.get(currentAddress);
-
-      if (currentCell instanceof CellExpr) {
-
-        if (currentCell.value(this).isError()) {
-          notifyObservers(currentAddress, currentCell.value(this).toString());
-        } else {
-          notifyObservers(currentAddress, "" + currentCell.value(this).value());
+      Cell cell = values.get(currentAddress);
+      if (checkCircularity(currentAddress, cell.toRawString())) {
+        if (cell instanceof CellComment || cell instanceof EmptyCell) {
+          notifyObservers(currentAddress, cell.toString());
+        }
+        if (cell instanceof CellExpr) {
+          if (cell.value(this).isError()) {
+            notifyObservers(currentAddress, cell.value(this).toString());
+          } else {
+            notifyObservers(currentAddress, "" + cell.value(this).value());
+          }
         }
       }
     });
@@ -92,21 +89,7 @@ public class XLModel implements Environment  {
     setup(true);
     try{
       reader.load(values);
-
-      values.forEach((currentAddress, value) -> {
-        Cell currentCell = values.get(currentAddress);
-        if (currentCell instanceof CellComment){
-          notifyObservers(currentAddress, currentCell.toString());
-        }
-        if (currentCell instanceof CellExpr ) {
-
-          if (currentCell.value(this).isError()) {
-            notifyObservers(currentAddress, currentCell.value(this).toString());
-          } else {
-            notifyObservers(currentAddress, "" + currentCell.value(this).value());
-          }
-        }
-      });
+      updateAll();
     } catch(IOException e){
       e.getMessage();
     }
@@ -134,7 +117,7 @@ public class XLModel implements Environment  {
     observerList.add(observer);
   }
 
-  public void removeObserver(XLModelObserver observer) {
+  /*public void removeObserver(XLModelObserver observer) {
     observerList.remove(observer);
   }*/
 
@@ -143,5 +126,4 @@ public class XLModel implements Environment  {
       o.notifyChange(address, text);
     }
   }
-
 }

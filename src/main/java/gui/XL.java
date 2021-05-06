@@ -115,7 +115,6 @@ public class XL extends Application {
     stage.show();
   }
 
-  // TODO: called when the displayed value in a cell is updated.
   public void cellValueUpdated(String address, String value) {
     GridCell cell = cells.get(address);
     if (cell != null) {
@@ -126,7 +125,6 @@ public class XL extends Application {
 
   public void loadFile(File file) {
     try {
-      System.out.println("XL LOADFILE");
       model.loadFile(file);
     } catch (IOException e) {
     }
