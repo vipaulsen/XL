@@ -44,16 +44,17 @@ public class XLModel implements Environment  {
    */
 
   public void update(CellAddress address, String text){
-    /*Expr temp;
-    try {
-      temp = parser.build(text);
-    } catch (IOException e){
-      temp = new ErrorExpr("");
+
+    if(text.equals(values.get(address.toString()).toRawString())) {
+      return;
     }
 
-    if (temp.toString().equals(values.get(address.toString()).toString())){ //|| text.equals()) {
+    if (text.toUpperCase(Locale.ROOT).contains(address.toString())){
+      Cell circularCell = new CircularCell(text);
+      values.put(address.toString(), circularCell);
+      notifyObservers(address.toString(), circularCell.value(this).toString());
       return;
-    }*/
+    }
 
     System.out.println("NOTIFYING ALL OBSERVERS");
     if(text.isEmpty()){
@@ -70,16 +71,14 @@ public class XLModel implements Environment  {
       values.put(address.toString(), new CellExpr(text));
     }
 
-    values.entrySet().forEach(entry ->{
-      String currentAddress = entry.getKey();
+    values.forEach((currentAddress, value) -> {
       Cell currentCell = values.get(currentAddress);
 
       if (currentCell instanceof CellExpr) {
 
-        if(currentCell.value(this).isError()){
+        if (currentCell.value(this).isError()) {
           notifyObservers(currentAddress, currentCell.value(this).toString());
-        }
-        else {
+        } else {
           notifyObservers(currentAddress, "" + currentCell.value(this).value());
         }
       }
@@ -88,6 +87,28 @@ public class XLModel implements Environment  {
 
   public void loadFile(File file) throws FileNotFoundException {
     XLBufferedReader reader = new XLBufferedReader(file);
+    System.out.println("XLMODEL LOADFILE");
+    setup(true);
+    try{
+      reader.load(values);
+
+      values.forEach((currentAddress, value) -> {
+        Cell currentCell = values.get(currentAddress);
+        if (currentCell instanceof CellComment){
+          notifyObservers(currentAddress, currentCell.toString());
+        }
+        if (currentCell instanceof CellExpr ) {
+
+          if (currentCell.value(this).isError()) {
+            notifyObservers(currentAddress, currentCell.value(this).toString());
+          } else {
+            notifyObservers(currentAddress, "" + currentCell.value(this).value());
+          }
+        }
+      });
+    } catch(IOException e){
+      e.getMessage();
+    }
   }
 
   public void saveFile(File file) {

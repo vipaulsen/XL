@@ -14,13 +14,13 @@ public class XLBufferedReader extends BufferedReader {
     super(new FileReader(file));
   }
 
-  // TODO Change Object to something appropriate
-  public void load(Map<String, Object> map) throws IOException {
+  // TODO Change Object to something appropriate DONE 2021-05-06
+  public void load(Map<String, Cell> map) throws IOException {
     try {
       while (ready()) {
         String string = readLine();
         int i = string.indexOf('=');
-        // TODO
+        map.put(string.substring(0,i),new CellFactory().makeCell(string.substring(i+1)));
       }
     } catch (Exception e) {
       throw new XLException(e.getMessage());

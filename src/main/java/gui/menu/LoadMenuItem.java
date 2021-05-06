@@ -17,6 +17,7 @@ public class LoadMenuItem extends MenuItem {
       File file = fileChooser.showOpenDialog(stage);
       if (file != null) {
         // TODO
+        System.out.println("LOADMENUITEM");
         xl.loadFile(file);
       }
     });

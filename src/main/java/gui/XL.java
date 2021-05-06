@@ -126,6 +126,7 @@ public class XL extends Application {
 
   public void loadFile(File file) {
     try {
+      System.out.println("XL LOADFILE");
       model.loadFile(file);
     } catch (IOException e) {
     }
