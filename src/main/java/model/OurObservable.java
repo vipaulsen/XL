@@ -1,7 +1,7 @@
 package model;
 
 //Kanske är användbar framöver
-public interface Observable {
+public interface OurObservable {
     void addObserver(XLModelObserver observer);
 
     void removeObserver(XLModelObserver observer);

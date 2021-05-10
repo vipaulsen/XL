@@ -1,20 +1,16 @@
 package model;
 
 import expr.*;
-import gui.CellSelectionObserver;
-import gui.GridCell;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
-public class XLModel implements Environment  {
+public class XLModel implements Environment {
   public static final int COLUMNS = 10, ROWS = 10;
   private Map<String, Cell> values = new HashMap<>();
+  private Map<String, Cell> temp = new HashMap<>();
   private ArrayList<XLModelObserver> observerList;
   private ExprParser parser;
 
@@ -24,13 +20,13 @@ public class XLModel implements Environment  {
     parser = new ExprParser();
   }
 
-  public void setup(Boolean clear){
+  public void setup(Boolean clear) {
     for (int r = 0; r < ROWS; r++) {
       for (int c = 0; c < COLUMNS; c++) {
         EmptyCell empt = new EmptyCell();
-        CellAddress addr = new CellAddress(r,c);
+        CellAddress addr = new CellAddress(r, c);
         values.put(addr.toString(), empt);
-        if(clear)
+        if (clear)
           notifyObservers(addr.toString(), empt.toString());
       }
     }
@@ -48,37 +44,57 @@ public class XLModel implements Environment  {
       return;
     }
 
-    if (checkCircularity(address.toString(), text)) {
+    if (checkReferenceSelf(address.toString(), text)) {
       Cell currentCell = new CellFactory().makeCell(text);
       values.put(address.toString(), currentCell);
       updateAll();
     }
   }
 
-  private boolean checkCircularity(String address, String text){
+  private boolean checkReferenceSelf(String address, String text) {
 
-    if (text.toUpperCase(Locale.ROOT).contains(address.toString())){
+    if (text.toUpperCase(Locale.ROOT).contains(address.toString())) {
       Cell circularCell = new CircularCell(text);
       values.put(address.toString(), circularCell);
       notifyObservers(address.toString(), circularCell.value(this).toString());
       return false;
     }
+
     return true;
   }
 
-  private void updateAll(){
+  private boolean checkCircularity(String address, String text) {
+    Cell odlCell = values.get(address);
+    CircularCell bomb = new CircularCell(text);
+    values.put(address, bomb);
+
+      if (odlCell.value(this) instanceof ErrorResult){
+        return false;
+      }
+      else{
+        values.put(address, odlCell);
+        return true;
+      }
+  }
+
+  private void updateAll() {
     values.forEach((currentAddress, value) -> {
+
       Cell cell = values.get(currentAddress);
-      if (checkCircularity(currentAddress, cell.toRawString())) {
-        if (cell instanceof CellComment || cell instanceof EmptyCell) {
-          notifyObservers(currentAddress, cell.toString());
-        }
-        if (cell instanceof CellExpr) {
-          if (cell.value(this).isError()) {
-            notifyObservers(currentAddress, cell.value(this).toString());
-          } else {
+
+      if (cell instanceof CellComment || cell instanceof EmptyCell) {
+        notifyObservers(currentAddress, cell.toString());
+      }
+
+      if (cell instanceof CellExpr) {
+
+        if (checkCircularity(currentAddress, value.toRawString())) {
+
             notifyObservers(currentAddress, "" + cell.value(this).value());
-          }
+        }
+        else{
+          //System.out.println("cell is error");
+          notifyObservers(currentAddress, cell.value(this).toString());
         }
       }
     });
@@ -87,19 +103,19 @@ public class XLModel implements Environment  {
   public void loadFile(File file) throws FileNotFoundException {
     XLBufferedReader reader = new XLBufferedReader(file);
     setup(true);
-    try{
+    try {
       reader.load(values);
       updateAll();
-    } catch(IOException e){
+    } catch (IOException e) {
       e.getMessage();
     }
   }
 
   public void saveFile(File file) {
-    try{XLPrintStream reader = new XLPrintStream(file.getName());
+    try {
+      XLPrintStream reader = new XLPrintStream(file.getName());
       reader.save(values.entrySet());
-    }
-    catch (IOException e){
+    } catch (IOException e) {
       e.getMessage();
     }
   }
@@ -109,7 +125,7 @@ public class XLModel implements Environment  {
     return values.get(address).value(this);
   }
 
-  public String getRawString(String address){
+  public String getRawString(String address) {
     return values.get(address).toRawString();
   }
 
@@ -121,8 +137,8 @@ public class XLModel implements Environment  {
     observerList.remove(observer);
   }*/
 
-  private void notifyObservers(String address, String text){
-    for (XLModelObserver o: observerList) {
+  private void notifyObservers(String address, String text) {
+    for (XLModelObserver o : observerList) {
       o.notifyChange(address, text);
     }
   }
