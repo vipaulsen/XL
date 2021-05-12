@@ -10,7 +10,6 @@ import java.util.*;
 public class XLModel implements Environment {
   public static final int COLUMNS = 10, ROWS = 10;
   private Map<String, Cell> values = new HashMap<>();
-  private Map<String, Cell> temp = new HashMap<>();
   private ArrayList<XLModelObserver> observerList;
   private ExprParser parser;
 
@@ -40,79 +39,42 @@ public class XLModel implements Environment {
    */
   public void update(CellAddress address, String text) {
 
-    if (text.equals(values.get(address.toString()).toRawString()) ){//&& !(values.get(address.toString()) instanceof CircularCell)) {
+    if (text.equals(values.get(address.toString()).toRawString()) ){
       return;
     }
-    Cell newCell = new CellFactory().makeCell(text);
 
-    validity(address.toString(), newCell);
+    Cell newCell = new CellFactory().makeCell(text);
+    if (newCell instanceof CellComment || newCell instanceof EmptyCell){
+      values.put(address.toString(), newCell);
+    } else{
+      validity(address.toString(), newCell);
+    }
       values.forEach((currentAddress, value) -> {
-        if(!(value instanceof EmptyCell)){
+        if (!(value instanceof EmptyCell || value instanceof CellComment)) {
           validity(currentAddress, value);
         }
       });
 
       updateAll();
-
-
     //CHECKA VALIDITY, SEDAN VALIDITY PÅ ALLA ANDRA CELLER SOM INTE ÄR TOMMA, SKAPA ERRORCELL OM DET PAJJAR
-
-    //räkna
-    /*if (checkReferenceSelf(address.toString(), text)) {
-      Cell currentCell = new CellFactory().makeCell(text);
-      values.put(address.toString(), currentCell);
-      //räkna ut modellen
-      count(address.toString(), text);
-      //values.get(address.toString()).value(this);
-
-    }*/
   }
 
   private void validity(String address, Cell cell){
-    Cell newCell = cell;
-    if (cell instanceof CircularCell){
-      newCell = new CellExpr(cell.toRawString());
+
+    if ((cell instanceof CircularCell || cell instanceof ErrorCell)){
+      cell = new CellExpr(cell.toRawString());
     }
+
     CircularCell bomb = new CircularCell(cell.toRawString());
     values.put(address, bomb);
 
-    if (newCell.value(this) instanceof ErrorResult){
-      values.put(address, new ErrorCell(cell.toRawString()));     //TODO: Make ErrorCell
+    if (cell.value(this) instanceof ErrorResult){
+      //System.out.println("kom hit");
+      values.put(address, new ErrorCell(cell.toRawString(), cell.value(this)));     //TODO: Make ErrorCell
     }
     else{
-      values.put(address, newCell);
+      values.put(address, cell);
     }
-  }
-
-  private boolean checkReferenceSelf(String address, String text) {
-
-    if (text.toUpperCase(Locale.ROOT).contains(address.toString())) {
-      Cell circularCell = new CircularCell(text);
-      values.put(address.toString(), circularCell);
-      notifyObservers(address.toString(), circularCell.value(this).toString());
-      return false;
-    }
-
-    return true;
-  }
-
-  private boolean checkCircularity(String address, String text) {
-    Cell odlCell = values.get(address);
-    /*if (odlCell instanceof CircularCell){
-      odlCell = new CellExpr(text);
-      values.put(address, odlCell);
-    }*/
-    CircularCell bomb = new CircularCell(text);
-    values.put(address, bomb);
-
-
-      if (odlCell.value(this) instanceof ErrorResult){
-        return false;
-      }
-      else{
-        values.put(address, odlCell);
-        return true;
-      }
   }
 
   private void updateAll() {
@@ -122,9 +84,9 @@ public class XLModel implements Environment {
 
       if (cell instanceof CellComment || cell instanceof EmptyCell) {
         notifyObservers(currentAddress, cell.toString());
-      } else if (cell instanceof CircularCell){
+      } /*else if (cell instanceof CircularCell){
         notifyObservers(currentAddress, cell.value(this).toString());
-      }else if (cell instanceof CellExpr){
+      }*/else if (cell instanceof CellExpr){
         notifyObservers(currentAddress, "" + values.get(currentAddress).value(this).value());
       } else if(cell instanceof ErrorCell){
         notifyObservers(currentAddress, cell.value(this).toString());
@@ -137,6 +99,11 @@ public class XLModel implements Environment {
     setup(true);
     try {
       reader.load(values);
+      values.forEach((currentAddress, value) -> {
+        if(!(value instanceof EmptyCell || value instanceof CellComment)){
+          validity(currentAddress, value);
+        }
+      });
       updateAll();
     } catch (IOException e) {
       e.getMessage();

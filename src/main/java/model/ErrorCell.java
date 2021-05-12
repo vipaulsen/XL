@@ -1,24 +1,27 @@
 package model;
 
-import expr.Environment;
-import expr.ErrorResult;
-import expr.ExprResult;
+import expr.*;
+
+import java.io.IOException;
 
 public class ErrorCell implements Cell{
     private String ogExpr;
+    private ExprResult errorMsg;
 
-    public ErrorCell(String text){
+
+    public ErrorCell(String text, ExprResult errorMsg){
         ogExpr = text;
+        this.errorMsg = errorMsg;
     }
 
     @Override
     public ExprResult value(Environment env) {
-        return new ErrorResult("error cell");
+        return errorMsg;
     }
 
     @Override
     public String toString(){
-     return ogExpr;
+        return ogExpr;
     }
 
     @Override
