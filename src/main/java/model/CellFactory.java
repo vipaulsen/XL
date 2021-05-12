@@ -6,7 +6,7 @@ public class CellFactory {
         if (text.isEmpty()) {
             producedCell = new EmptyCell();
         }else if(text.charAt(0) == '#'){
-            producedCell = new CellComment(text);
+            producedCell = new CommentCell(text);
         }else{
             producedCell = new CellExpr(text);
         }

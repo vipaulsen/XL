@@ -4,9 +4,9 @@ import expr.Environment;
 import expr.ErrorResult;
 import expr.ExprResult;
 
-public class CellComment implements Cell{
+public class CommentCell implements Cell{
     private String comment;
-    public CellComment(String s){
+    public CommentCell(String s){
         comment = s;
     }
 

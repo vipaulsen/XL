@@ -44,13 +44,13 @@ public class XLModel implements Environment {
     }
 
     Cell newCell = new CellFactory().makeCell(text);
-    if (newCell instanceof CellComment || newCell instanceof EmptyCell){
+    if (newCell instanceof CommentCell || newCell instanceof EmptyCell){
       values.put(address.toString(), newCell);
     } else{
       validity(address.toString(), newCell);
     }
       values.forEach((currentAddress, value) -> {
-        if (!(value instanceof EmptyCell || value instanceof CellComment)) {
+        if (!(value instanceof EmptyCell || value instanceof CommentCell)) {
           validity(currentAddress, value);
         }
       });
@@ -82,7 +82,7 @@ public class XLModel implements Environment {
 
       Cell cell = values.get(currentAddress);
 
-      if (cell instanceof CellComment || cell instanceof EmptyCell) {
+      if (cell instanceof CommentCell || cell instanceof EmptyCell) {
         notifyObservers(currentAddress, cell.toString());
       } /*else if (cell instanceof CircularCell){
         notifyObservers(currentAddress, cell.value(this).toString());
@@ -100,7 +100,7 @@ public class XLModel implements Environment {
     try {
       reader.load(values);
       values.forEach((currentAddress, value) -> {
-        if(!(value instanceof EmptyCell || value instanceof CellComment)){
+        if(!(value instanceof EmptyCell || value instanceof CommentCell)){
           validity(currentAddress, value);
         }
       });

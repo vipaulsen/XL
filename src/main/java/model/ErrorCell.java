@@ -2,8 +2,6 @@ package model;
 
 import expr.*;
 
-import java.io.IOException;
-
 public class ErrorCell implements Cell{
     private String ogExpr;
     private ExprResult errorMsg;
