@@ -40,14 +40,47 @@ public class XLModel implements Environment {
    */
   public void update(CellAddress address, String text) {
 
-    if (text.equals(values.get(address.toString()).toRawString())) {
+    if (text.equals(values.get(address.toString()).toRawString()) ){//&& !(values.get(address.toString()) instanceof CircularCell)) {
       return;
     }
+    Cell newCell = new CellFactory().makeCell(text);
 
-    if (checkReferenceSelf(address.toString(), text)) {
+    validity(address.toString(), newCell);
+      values.forEach((currentAddress, value) -> {
+        if(!(value instanceof EmptyCell)){
+          validity(currentAddress, value);
+        }
+      });
+
+      updateAll();
+
+
+    //CHECKA VALIDITY, SEDAN VALIDITY PÅ ALLA ANDRA CELLER SOM INTE ÄR TOMMA, SKAPA ERRORCELL OM DET PAJJAR
+
+    //räkna
+    /*if (checkReferenceSelf(address.toString(), text)) {
       Cell currentCell = new CellFactory().makeCell(text);
       values.put(address.toString(), currentCell);
-      updateAll();
+      //räkna ut modellen
+      count(address.toString(), text);
+      //values.get(address.toString()).value(this);
+
+    }*/
+  }
+
+  private void validity(String address, Cell cell){
+    Cell newCell = cell;
+    if (cell instanceof CircularCell){
+      newCell = new CellExpr(cell.toRawString());
+    }
+    CircularCell bomb = new CircularCell(cell.toRawString());
+    values.put(address, bomb);
+
+    if (newCell.value(this) instanceof ErrorResult){
+      values.put(address, new ErrorCell(cell.toRawString()));     //TODO: Make ErrorCell
+    }
+    else{
+      values.put(address, newCell);
     }
   }
 
@@ -65,8 +98,13 @@ public class XLModel implements Environment {
 
   private boolean checkCircularity(String address, String text) {
     Cell odlCell = values.get(address);
+    /*if (odlCell instanceof CircularCell){
+      odlCell = new CellExpr(text);
+      values.put(address, odlCell);
+    }*/
     CircularCell bomb = new CircularCell(text);
     values.put(address, bomb);
+
 
       if (odlCell.value(this) instanceof ErrorResult){
         return false;
@@ -84,18 +122,12 @@ public class XLModel implements Environment {
 
       if (cell instanceof CellComment || cell instanceof EmptyCell) {
         notifyObservers(currentAddress, cell.toString());
-      }
-
-      if (cell instanceof CellExpr) {
-
-        if (checkCircularity(currentAddress, value.toRawString())) {
-
-            notifyObservers(currentAddress, "" + cell.value(this).value());
-        }
-        else{
-          //System.out.println("cell is error");
-          notifyObservers(currentAddress, cell.value(this).toString());
-        }
+      } else if (cell instanceof CircularCell){
+        notifyObservers(currentAddress, cell.value(this).toString());
+      }else if (cell instanceof CellExpr){
+        notifyObservers(currentAddress, "" + values.get(currentAddress).value(this).value());
+      } else if(cell instanceof ErrorCell){
+        notifyObservers(currentAddress, cell.value(this).toString());
       }
     });
   }
