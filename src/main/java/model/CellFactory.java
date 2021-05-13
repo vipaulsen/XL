@@ -1,5 +1,7 @@
 package model;
 
+import expr.ExprResult;
+
 public class CellFactory {
     public Cell makeCell(String text) {
         Cell producedCell;
@@ -11,5 +13,12 @@ public class CellFactory {
             producedCell = new CellExpr(text);
         }
         return producedCell;
+    }
+    public CircularCell makeCircularCell(String text){
+        return new CircularCell(text);
+    }
+
+    public ErrorCell makeErrorCell(String text, ExprResult expr){
+        return new ErrorCell(text, expr);
     }
 }

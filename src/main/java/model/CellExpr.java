@@ -6,10 +6,10 @@ import java.io.IOException;
 
 public class CellExpr implements Cell{
     private Expr expr;
-    private String ogexpr;
+    private String origExpr;
 
     public CellExpr(String stringExpr){
-        ogexpr = stringExpr;
+        origExpr = stringExpr;
         ExprParser parser = new ExprParser();
         try {
             expr = parser.build(stringExpr);

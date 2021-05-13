@@ -80,8 +80,7 @@ public class XL extends Application {
       if (newValue != null) {
         addressLbl.setText(newValue.address.toString() + " =");
         editor.setDisable(false);
-        // TODO: update editor text. DONE 2021-05-04
-        editor.setText(model.getRawString(currentCell.get().address.toString()));
+        editor.setText(model.getExpression(currentCell.get().address.toString()));
         editor.requestFocus();
       } else {
         addressLbl.setText("?? =");

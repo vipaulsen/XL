@@ -11,18 +11,16 @@ public class XLModel implements Environment {
   public static final int COLUMNS = 10, ROWS = 10;
   private Map<String, Cell> values = new HashMap<>();
   private ArrayList<XLModelObserver> observerList;
-  private ExprParser parser;
 
   public XLModel() {
     setup(false);
     observerList = new ArrayList<>();
-    parser = new ExprParser();
   }
 
   public void setup(Boolean clear) {
     for (int r = 0; r < ROWS; r++) {
       for (int c = 0; c < COLUMNS; c++) {
-        EmptyCell empt = new EmptyCell();
+        Cell empt = new CellFactory().makeCell("");
         CellAddress addr = new CellAddress(r, c);
         values.put(addr.toString(), empt);
         if (clear)
@@ -60,7 +58,7 @@ public class XLModel implements Environment {
   }
 
   private void validity(String address, Cell cell){
-
+    CellFactory cellMaker = new CellFactory();
     if ((cell instanceof CircularCell || cell instanceof ErrorCell)){
       cell = new CellExpr(cell.toRawString());
     }
@@ -69,8 +67,7 @@ public class XLModel implements Environment {
     values.put(address, bomb);
 
     if (cell.value(this) instanceof ErrorResult){
-      //System.out.println("kom hit");
-      values.put(address, new ErrorCell(cell.toRawString(), cell.value(this)));     //TODO: Make ErrorCell
+      values.put(address, cellMaker.makeErrorCell(cell.toString(), cell.value(this)));
     }
     else{
       values.put(address, cell);
