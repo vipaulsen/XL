@@ -2,7 +2,6 @@ package model;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -15,7 +14,7 @@ public class XLPrintStream extends PrintStream {
     for (Entry<String, Cell> entry : set) {
       print(entry.getKey());
       print('=');
-      println(entry.getValue().toRawString());
+      println(entry.getValue().toString());
     }
     flush();
     close();

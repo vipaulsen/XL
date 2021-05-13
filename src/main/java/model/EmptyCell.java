@@ -12,10 +12,6 @@ public class EmptyCell implements Cell{
     }
 
     @Override
-    public String toString(){
-        return "";
-    }
+    public String toString(){ return ""; }
 
-    @Override
-    public String toRawString() { return "";}
 }

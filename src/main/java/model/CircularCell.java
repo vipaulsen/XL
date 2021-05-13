@@ -20,9 +20,4 @@ public class CircularCell implements Cell{
         return comment;
     }
 
-    @Override
-    public String toRawString(){
-        return comment;
-    }
-
 }

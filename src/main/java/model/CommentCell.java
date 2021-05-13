@@ -11,17 +11,9 @@ public class CommentCell implements Cell{
     }
 
     @Override
-    public ExprResult value(Environment env) {
-        return new ErrorResult("Referencing comment");
-    }
+    public ExprResult value(Environment env) { return new ErrorResult("Referencing comment"); }
 
     @Override
-    public String toString(){
-        return comment.substring(1);
-    }
+    public String toString(){ return comment; }
 
-    @Override
-    public String toRawString(){
-        return comment;
-    }
 }

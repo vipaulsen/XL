@@ -22,8 +22,4 @@ public class ErrorCell implements Cell{
         return ogExpr;
     }
 
-    @Override
-    public String toRawString() {
-        return ogExpr;
-    }
 }

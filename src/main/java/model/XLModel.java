@@ -37,7 +37,7 @@ public class XLModel implements Environment {
    */
   public void update(CellAddress address, String text) {
 
-    if (text.equals(values.get(address.toString()).toRawString()) ){
+    if (text.equals(values.get(address.toString()).toString()) ){
       return;
     }
 
@@ -60,10 +60,10 @@ public class XLModel implements Environment {
   private void validity(String address, Cell cell){
     CellFactory cellMaker = new CellFactory();
     if ((cell instanceof CircularCell || cell instanceof ErrorCell)){
-      cell = new CellExpr(cell.toRawString());
+      cell = cellMaker.makeCell(cell.toString());
     }
 
-    CircularCell bomb = new CircularCell(cell.toRawString());
+    CircularCell bomb = cellMaker.makeCircularCell(cell.toString());
     values.put(address, bomb);
 
     if (cell.value(this) instanceof ErrorResult){
@@ -79,11 +79,11 @@ public class XLModel implements Environment {
 
       Cell cell = values.get(currentAddress);
 
-      if (cell instanceof CommentCell || cell instanceof EmptyCell) {
+      if (cell instanceof CommentCell) {
+        notifyObservers(currentAddress, cell.toString().substring(1));
+      } else if(cell instanceof EmptyCell){
         notifyObservers(currentAddress, cell.toString());
-      } /*else if (cell instanceof CircularCell){
-        notifyObservers(currentAddress, cell.value(this).toString());
-      }*/else if (cell instanceof CellExpr){
+      } else if (cell instanceof CellExpr){
         notifyObservers(currentAddress, "" + values.get(currentAddress).value(this).value());
       } else if(cell instanceof ErrorCell){
         notifyObservers(currentAddress, cell.value(this).toString());
@@ -121,17 +121,13 @@ public class XLModel implements Environment {
     return values.get(address).value(this);
   }
 
-  public String getRawString(String address) {
-    return values.get(address).toRawString();
+  public String getExpression(String address) {
+    return values.get(address).toString();
   }
 
   public void addObserver(XLModelObserver observer) {
     observerList.add(observer);
   }
-
-  /*public void removeObserver(XLModelObserver observer) {
-    observerList.remove(observer);
-  }*/
 
   private void notifyObservers(String address, String text) {
     for (XLModelObserver o : observerList) {

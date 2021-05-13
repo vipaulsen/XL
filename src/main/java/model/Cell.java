@@ -9,5 +9,4 @@ public interface Cell {
 
     String toString();
 
-    String toRawString();
 }

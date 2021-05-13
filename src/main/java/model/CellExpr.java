@@ -24,10 +24,9 @@ public class CellExpr implements Cell{
         return expr.value(env);
     }
 
+    @Override
     public String toString(){
-        return expr.toString();
+        return origExpr;
     }
-
-    public String toRawString(){return ogexpr;}
 
 }
