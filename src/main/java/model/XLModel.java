@@ -9,7 +9,7 @@ import java.util.*;
 
 public class XLModel implements Environment {
   public static final int COLUMNS = 10, ROWS = 10;
-  private Map<String, Cell> values = new HashMap<>();
+  private Map<String, Cell> values = new LinkedHashMap<>();
   private ArrayList<XLModelObserver> observerList;
 
   public XLModel() {
